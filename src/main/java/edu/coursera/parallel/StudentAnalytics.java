@@ -34,7 +34,7 @@ public final class StudentAnalytics {
     }
 
     /**
-     * TODO compute the average age of all actively enrolled students using
+     * compute the average age of all actively enrolled students using
      * parallel streams. This should mirror the functionality of
      * averageAgeOfEnrolledStudentsImperative. This method should not use any
      * loops.
@@ -49,7 +49,6 @@ public final class StudentAnalytics {
                 .filter( s -> s.checkIsCurrent())
                 .mapToDouble(Student::getAge)
                 .average().getAsDouble();
-        //throw new UnsupportedOperationException();
     }
 
     /**
@@ -93,7 +92,7 @@ public final class StudentAnalytics {
     }
 
     /**
-     * TODO compute the most common first name out of all students that are no
+     * compute the most common first name out of all students that are no
      * longer active in the class using parallel streams. This should mirror the
      * functionality of mostCommonFirstNameOfInactiveStudentsImperative. This
      * method should not use any loops.
@@ -117,7 +116,6 @@ public final class StudentAnalytics {
                         .filter( s -> s.checkIsCurrent() == false)
                         .collect(groupingBy(Student::getFirstName,counting())); // toSet()
         System.out.println(stu);
-        System.out.println(stu.getClass());
 
         Long maksimum = Arrays.stream(studentArray)
                 .parallel()
