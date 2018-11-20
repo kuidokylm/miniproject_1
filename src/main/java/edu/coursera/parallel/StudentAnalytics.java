@@ -1,10 +1,8 @@
 package edu.coursera.parallel;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Stream;
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * A simple wrapper class for various analytics methods.
@@ -46,7 +44,12 @@ public final class StudentAnalytics {
      */
     public double averageAgeOfEnrolledStudentsParallelStream(
             final Student[] studentArray) {
-        throw new UnsupportedOperationException();
+        return Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> s.checkIsCurrent())
+                .mapToDouble(Student::getAge)
+                .average().getAsDouble();
+        //throw new UnsupportedOperationException();
     }
 
     /**
@@ -94,13 +97,55 @@ public final class StudentAnalytics {
      * longer active in the class using parallel streams. This should mirror the
      * functionality of mostCommonFirstNameOfInactiveStudentsImperative. This
      * method should not use any loops.
-     *
+     https://marcin-chwedczuk.github.io/grouping-using-java-8-streams
      * @param studentArray Student data for the class.
      * @return Most common first name of inactive students
      */
+    //
     public String mostCommonFirstNameOfInactiveStudentsParallelStream(
             final Student[] studentArray) {
-        throw new UnsupportedOperationException();
+        /*
+        Map<String,List<Student>> stud =
+        Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> s.checkIsCurrent() == false)
+                .collect(groupingBy(Student::getFirstName,toCollection(ArrayList::new))); // toSet()
+        System.out.println(stud);
+        Map<String,Long> stu =
+                Arrays.stream(studentArray)
+                        .parallel()
+                        .filter( s -> s.checkIsCurrent() == false)
+                        .collect(groupingBy(Student::getFirstName,counting())); // toSet()
+        System.out.println(stu);
+        System.out.println(stu.getClass());
+
+        Long maksimum = Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> s.checkIsCurrent() == false)
+                .collect(groupingBy(Student::getFirstName,counting())).values().stream()
+                .max(Comparator.comparing(a->a))
+                .get();
+        System.out.println("Maksimum: "+maksimum);
+
+        List<Map.Entry<String, Long>> st = Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> s.checkIsCurrent() == false)
+                .collect(groupingBy(Student::getFirstName,counting()))
+                .entrySet().stream()
+                .collect(toList());
+        System.out.println("Maksimum List: "+st);
+        */
+        return Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> !s.checkIsCurrent())
+                .collect(groupingBy(Student::getFirstName,counting()))
+                .entrySet().stream()
+                .collect(toList())
+                .stream()
+                .min((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
+                .get().getKey();
+//                .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))  //reverse
+//                .findFirst().get().getKey();
     }
 
     /**
@@ -136,6 +181,11 @@ public final class StudentAnalytics {
      */
     public int countNumberOfFailedStudentsOlderThan20ParallelStream(
             final Student[] studentArray) {
-        throw new UnsupportedOperationException();
+        Long kokku=Arrays.stream(studentArray)
+                .parallel()
+                .filter( s -> ( !s.checkIsCurrent() && s.getGrade() < 65 ))
+                .filter(s -> s.getAge() > 20)
+                .count();
+        return Integer.valueOf(String.valueOf(kokku));
     }
 }
