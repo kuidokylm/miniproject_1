@@ -45,8 +45,8 @@ public final class MatrixMultiply {
          * TODO Parallelize this outermost two-dimension sequential loop to
          * achieve performance improvement.
          */
-        //forall2d(0, N - 1, 0, N - 1, (i, j) -> {
-        forall2dChunked(0, N - 1, 0, N - 1, (i, j) -> {
+        //forall2d(0, N - 1, 0, N - 1, (i, j) -> {  //see teeb aeglasemalt
+        forall2dChunked(0, N - 1, 0, N - 1, (i, j) -> {  //chunkimine lisab kiirust
             C[i][j] = 0.0;
             for (int k = 0; k < N; k++) {
                 C[i][j] += A[i][k] * B[k][j];
