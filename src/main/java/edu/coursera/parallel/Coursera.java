@@ -9,7 +9,7 @@ public class Coursera {
         System.out.println("Tere Coursera");
         //System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism","3");
 
-
+        //week1
         /*
         double x;
         Random r = new Random();
@@ -30,6 +30,8 @@ public class Coursera {
         }
         */
 
+        /*
+        //week2
         Student[] students = new Student[7];
         Student stu = new Student("Sanjay","Chatterjee",26, 54, true);
         students[0]=stu;
@@ -62,6 +64,36 @@ public class Coursera {
 
         failinuid = stud.countNumberOfFailedStudentsOlderThan20ParallelStream(students);
         System.out.println("PAR Failinuid: "+failinuid);
+        */
 
+        //week3
+        int N = 500;
+        final double[][] A = createMatrix(N);
+        final double[][] B = createMatrix(N);
+        final double[][] C = new double[N][N];
+        final double[][] refC = new double[N][N];
+
+        // Use a reference sequential version to compute the correct result
+        long startTime = System.nanoTime();
+        MatrixMultiply.seqMatrixMultiply(A, B, refC, N);
+        long timeInNanos = System.nanoTime()-startTime;
+        System.out.printf("SEQ Time %8.3f millisec",timeInNanos/1e6);
+        startTime = System.nanoTime();
+        MatrixMultiply.parMatrixMultiply(A, B, refC, N);
+        timeInNanos = System.nanoTime()-startTime;
+        System.out.println("");
+        System.out.printf("PAR Time %8.3f millisec",timeInNanos/1e6);
+    }
+
+    private static double[][] createMatrix(final int N) {
+        final double[][] input = new double[N][N];
+        final Random rand = new Random(314);
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                input[i][j] = rand.nextInt(100);
+            }
+        }
+        return input;
     }
 }
