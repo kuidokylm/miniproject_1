@@ -44,6 +44,7 @@ public final class StudentAnalytics {
      */
     public double averageAgeOfEnrolledStudentsParallelStream(
             final Student[] studentArray) {
+
         return Arrays.stream(studentArray)
                 .parallel()
                 .filter( s -> s.checkIsCurrent())
