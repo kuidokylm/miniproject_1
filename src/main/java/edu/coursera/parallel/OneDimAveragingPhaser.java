@@ -97,7 +97,6 @@ public final class OneDimAveragingPhaser {
      * uses the Phaser.arrive and Phaser.awaitAdvance APIs to overlap
      * computation with barrier completion.
      *
-     * TODO Complete this method based on the provided runSequential and
      * runParallelBarrier methods.
      *
      * @param iterations The number of iterations to run
