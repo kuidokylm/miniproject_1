@@ -109,39 +109,55 @@ public final class OneDimAveragingPhaser {
     public static void runParallelFuzzyBarrier(final int iterations,
                                                final double[] myNew, final double[] myVal, final int n,
                                                final int tasks) {
+        //eelmine versioon
+        //Phaser ph = new Phaser(0);
+        //ph.bulkRegister(tasks);
 
-        Phaser ph = new Phaser(0);
-        ph.bulkRegister(tasks);
+        Phaser[] phasers = new Phaser[tasks];
+
+        for(int i = 0; i < phasers.length; i++){
+            phasers[i] = new Phaser(1);
+        }
 
         Thread[] threads = new Thread[tasks];
 
-        for (int ii = 0; ii < tasks; ii++) {
+        for (int ii = 0; ii < tasks; ii++) {  //ii jookseb kuni tasks muutujani, iga ii kohta on yks phaser
             final int i = ii;
 
             threads[ii] = new Thread(() -> {
                 double[] threadPrivateMyVal = myVal;
                 double[] threadPrivateMyNew = myNew;
-
-                final int chunkSize = (n + tasks - 1) / tasks;
-                final int left = (i * chunkSize) + 1;
-                int right = (left + chunkSize) - 1;
-                if (right > n) right = n;
-
+                // juppideks jagamise teeb ylemise for loopi sees
                 for (int iter = 0; iter < iterations; iter++) {
-                    int currentPhase = ph.arrive();  //uuskood
-                    for (int j = left; j <= right; j++) {
+                    final int left = i * (n / tasks) + 1;
+                    final int right = (i + 1) * (n / tasks);
 
-                        threadPrivateMyNew[j] = (threadPrivateMyVal[j - 1]
-                                + threadPrivateMyVal[j + 1]) / 2.0;
+                    for (int j = left; j <= right; j++) {
+                        threadPrivateMyNew[j] = (threadPrivateMyVal[j - 1] + threadPrivateMyVal[j + 1]) / 2.0;
                     }
-                    //ph.arriveAndAwaitAdvance(); //vanakood
-                    ph.awaitAdvance(currentPhase);  //uuskood
+
+                    phasers[i].arrive(); //need teevad siis lihtsa barrieri simuleerimise, arriveAndAwaitAdvance analoog
+                    //et jatkata peavad eelmised arvutused olema lopetatud
+                    if( (i-1) >= 0){  //kui eelmine vasakpoolne tsykkel on arvutatud ja pole koige esimene tsykkel
+                        phasers[i-1].awaitAdvance(iter);
+                    }
+                    if( (i+1) < tasks ){  ////kui eelmine parempoolne tsykkel on arvutatud ja pole koige viimane tsykkel
+                        phasers[i+1].awaitAdvance(iter);
+                    }
 
                     double[] temp = threadPrivateMyNew;
                     threadPrivateMyNew = threadPrivateMyVal;
                     threadPrivateMyVal = temp;
                 }
+
+                /*
+                // loe siit, kuidas tuleb teha
+                //https://www.coursera.org/learn/parallel-programming-in-java/programming/627wb/mini-project-4-submission/discussions/threads/Zohv3gQ3Eei5SxInkadJcA
+                */
             });
+
+
+
             threads[ii].start();
         }
 
